@@ -15,9 +15,14 @@ class OllamaClient:
     def _openai_compatible_chat(self, prompt: str, temperature: float) -> str:
         api_key = os.getenv("OPENAI_API_KEY", "").strip()
         if not api_key:
-            raise RuntimeError("missing_openai_key")
-        base = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
-        chat_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+            api_key = os.getenv("GROQ_API_KEY", "").strip()
+            if not api_key:
+                raise RuntimeError("missing_openai_or_groq_key")
+            base = "https://api.groq.com/openai/v1"
+            chat_model = os.getenv("GROQ_MODEL", "llama3-8b-8192")
+        else:
+            base = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
+            chat_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
         url = f"{base}/chat/completions"
         with httpx.Client(timeout=120.0) as client:
             r = client.post(
@@ -45,26 +50,25 @@ class OllamaClient:
             )
             return resp["message"]["content"].strip()
         except Exception as exc:
-            if os.getenv("OPENAI_API_KEY", "").strip():
+            if os.getenv("OPENAI_API_KEY", "").strip() or os.getenv("GROQ_API_KEY", "").strip():
                 try:
                     return self._openai_compatible_chat(prompt, temperature)
                 except Exception as fallback_exc:
                     return (
                         "**LLM unavailable**\n\n"
-                        "Ollama could not be reached, and the OpenAI fallback also failed.\n\n"
+                        "Ollama could not be reached, and the cloud LLM fallback also failed.\n\n"
                         f"- Ollama error: `{exc!s}`\n"
                         f"- Fallback error: `{fallback_exc!s}`\n\n"
-                        "For **Streamlit Cloud**, set `OPENAI_API_KEY` in app secrets, or expose Ollama "
-                        "and set `OLLAMA_HOST` to that URL. For **local** use, run Ollama on this machine."
+                        "For **Streamlit Cloud**, set `OPENAI_API_KEY` or `GROQ_API_KEY` in app secrets.\n"
+                        "For **local** use, run Ollama on this machine."
                     )
             return (
                 "**LLM unavailable (Ollama not reachable)**\n\n"
                 "Streamlit Cloud has no local Ollama server. Choose one:\n\n"
-                "1. **OpenAI (recommended for cloud):** add `OPENAI_API_KEY` (and optionally "
-                "`OPENAI_MODEL`, `OPENAI_BASE_URL`) in Streamlit **Secrets** or `.env`.\n\n"
-                "2. **Remote Ollama:** run Ollama on a server you control and set `OLLAMA_HOST` "
-                "(for example `https://your-host:11434`) in secrets.\n\n"
-                "3. **Local demo:** run `streamlit run app.py` on your PC with Ollama installed.\n\n"
+                "1. **OpenAI:** add `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`, `OPENAI_BASE_URL`) in Streamlit **Secrets**.\n\n"
+                "2. **Groq (free tier available):** add `GROQ_API_KEY` (and optionally `GROQ_MODEL`) in Streamlit **Secrets**. Get key at https://console.groq.com/.\n\n"
+                "3. **Remote Ollama:** run Ollama on a server you control and set `OLLAMA_HOST` (for example `https://your-host:11434`) in secrets.\n\n"
+                "4. **Local demo:** run `streamlit run app.py` on your PC with Ollama installed.\n\n"
                 f"Technical detail: `{exc!s}`"
             )
 
