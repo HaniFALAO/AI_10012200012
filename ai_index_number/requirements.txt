@@ -2,10 +2,10 @@ streamlit
 pandas
 PyMuPDF
 sentence-transformers
+torchvision
 faiss-cpu
 numpy
 scikit-learn
 rank-bm25
 python-dotenv
 ollama
-pytest

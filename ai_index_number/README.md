@@ -59,6 +59,13 @@ Core modules:
 streamlit run app.py
 ```
 
+## Deploy on Streamlit Community Cloud
+1. **Main file:** set to `ai_index_number/app.py` (or your equivalent path).
+2. **Python requirements:** `ai_index_number/requirements.txt`.
+3. **Commit datasets:** `data/Ghana_Election_Result.csv` and `data/2025_Budget_Statement.pdf` must be in the GitHub repo (not only on your laptop). If they are large, use [Git LFS](https://git-lfs.github.com/).
+4. **Paths:** the app resolves `data/` and `outputs/` from the `ai_index_number` folder so it works whether the process cwd is the repo root or the app folder.
+5. **Ollama:** Streamlit Cloud cannot reach your local Ollama. For a hosted demo, point generation to a remote API or host Ollama on a reachable server and set env vars your client supports.
+
 ## How Retrieval Works
 1. CSV rows are converted into natural-language record chunks.
 2. PDF is chunked using either:

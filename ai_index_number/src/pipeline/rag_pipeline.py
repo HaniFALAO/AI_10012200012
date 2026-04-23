@@ -15,6 +15,7 @@ from src.retrieval.hybrid_retriever import HybridRetriever, select_context
 from src.retrieval.vector_store import FaissVectorStore
 from src.utils.helpers import write_json
 from src.utils.logger import JsonLogger
+from src.utils.paths import project_root, resolve_under_root
 
 
 class AcademicCityRAG:
@@ -25,10 +26,12 @@ class AcademicCityRAG:
         chunk_method: str = "paragraph",
         outputs_dir: str = "outputs",
     ) -> None:
-        self.csv_path = csv_path
-        self.pdf_path = pdf_path
+        root = project_root()
+        self.csv_path = str(resolve_under_root(csv_path))
+        self.pdf_path = str(resolve_under_root(pdf_path))
         self.chunk_method = chunk_method
-        self.outputs_dir = Path(outputs_dir)
+        out = Path(outputs_dir)
+        self.outputs_dir = out if out.is_absolute() else (root / out)
         self.outputs_dir.mkdir(parents=True, exist_ok=True)
         self.logger = JsonLogger(str(self.outputs_dir / "logs.json"))
         self.ready = False

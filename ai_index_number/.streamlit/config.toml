@@ -1,0 +1,4 @@
+# Stops Streamlit from walking optional transformers vision submodules (torchvision noise).
+# https://docs.streamlit.io/develop/api-reference/configuration/config.toml
+[server]
+fileWatcherType = "none"
