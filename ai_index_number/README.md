@@ -64,7 +64,7 @@ streamlit run app.py
 2. **Python requirements:** `ai_index_number/requirements.txt`.
 3. **Commit datasets:** `data/Ghana_Election_Result.csv` and `data/2025_Budget_Statement.pdf` must be in the GitHub repo (not only on your laptop). If they are large, use [Git LFS](https://git-lfs.github.com/).
 4. **Paths:** the app resolves `data/` and `outputs/` from the `ai_index_number` folder so it works whether the process cwd is the repo root or the app folder.
-5. **Ollama:** Streamlit Cloud cannot reach your local Ollama. For a hosted demo, point generation to a remote API or host Ollama on a reachable server and set env vars your client supports.
+5. **LLM on Streamlit Cloud:** there is no local Ollama. Either add **`OPENAI_API_KEY`** (and optionally `OPENAI_MODEL`) in **App settings → Secrets** so the app falls back to OpenAI after Ollama fails, or set **`OLLAMA_HOST`** to a public Ollama URL you control. Otherwise the chat will show a clear “LLM unavailable” message instead of crashing.
 
 ## How Retrieval Works
 1. CSV rows are converted into natural-language record chunks.

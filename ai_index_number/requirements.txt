@@ -9,3 +9,4 @@ scikit-learn
 rank-bm25
 python-dotenv
 ollama
+httpx
