@@ -7,7 +7,7 @@ import ollama
 
 
 class OllamaClient:
-    """Local Ollama by default; optional OpenAI-compatible HTTP API when Ollama is unreachable."""
+    """Groq/OpenAI (if configured), otherwise local Ollama."""
 
     def __init__(self, model: str | None = None) -> None:
         self.model = model or os.getenv("OLLAMA_MODEL", "llama3.1:8b")
@@ -42,6 +42,28 @@ class OllamaClient:
         return str(data["choices"][0]["message"]["content"]).strip()
 
     def generate(self, prompt: str, temperature: float = 0.1) -> str:
+        # Prefer hosted APIs in cloud environments when keys are configured.
+        if os.getenv("GROQ_API_KEY", "").strip() or os.getenv("OPENAI_API_KEY", "").strip():
+            try:
+                return self._openai_compatible_chat(prompt, temperature)
+            except Exception as cloud_exc:
+                # If cloud call fails, fall back to local Ollama attempt.
+                try:
+                    resp = ollama.chat(
+                        model=self.model,
+                        messages=[{"role": "user", "content": prompt}],
+                        options={"temperature": temperature},
+                    )
+                    return resp["message"]["content"].strip()
+                except Exception as ollama_exc:
+                    return (
+                        "**LLM unavailable**\n\n"
+                        "Configured cloud model call failed, and Ollama fallback also failed.\n\n"
+                        f"- Cloud error: `{cloud_exc!s}`\n"
+                        f"- Ollama error: `{ollama_exc!s}`\n\n"
+                        "Check `GROQ_API_KEY` / `OPENAI_API_KEY` and model names in env/secrets."
+                    )
+
         try:
             resp = ollama.chat(
                 model=self.model,
