@@ -1,7 +1,7 @@
 # Academic City Custom RAG Chatbot (CS4241 Exam Project)
 
-**Student Name:** `<YOUR_NAME_HERE>`  
-**Index Number:** `<YOUR_INDEX_NUMBER_HERE>`
+**Student Name:** `<Hanif_CHITOU>`  
+**Index Number:** `<10012200012>`
 
 ## Overview
 This project implements a full **custom Retrieval-Augmented Generation (RAG)** chatbot for Academic City using:
